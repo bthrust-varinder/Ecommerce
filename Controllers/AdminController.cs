@@ -16,14 +16,6 @@ namespace ECommerce.Controllers
         //
         // GET: /Admin/
 
-        public ActionResult LogOff()
-        {
-            FormsAuthentication.SignOut();
-            //WebSecurity.Logout();
-            Session["Admin"] = null;
-            return RedirectToAction("Index", "Admin");
-        }
-
         [AllowAnonymous]
         [ChildActionOnly]
         public ActionResult PartialLogin(string returnUrl)
@@ -38,15 +30,11 @@ namespace ECommerce.Controllers
                 ViewBag.LoggedIn = false;
             }
             ViewBag.ReturnUrl = returnUrl;
-            return PartialView("_LoginAdminPartial");
+            return PartialView("_LoginPartial");
         }
 
         public ActionResult Index()
         {
-            if (Session["Admin"] != null)
-            {
-                return RedirectToAction("Products", "Admin");
-            }
             return View();
         }
 
@@ -82,61 +70,12 @@ namespace ECommerce.Controllers
 
         public ActionResult EditPrpduct(int id)
         {
-            if (Session["Admin"] == null)
-            {
-                return RedirectToAction("Index", "Admin");
-            }
             TB_Product prd = entities.TB_Product.Where(x => x.TB_ProductID == id).FirstOrDefault();
             return View(prd);
 
         }
-
-        public ActionResult ChangePassword()
-        {
-            if (Session["Admin"] == null)
-            {
-                return RedirectToAction("Index", "Admin");
-            }
-           
-            return View();
-
-        }
-
-        [HttpPost]
-        public ActionResult ChangePassword(FormCollection model)
-        {
-            string CurrentPwd = model["CurrentPwd"];
-            string NewPwd = model["NewPwd"];
-            string ConfirmPwd = model["ConfirmPwd"];
-
-            if (NewPwd != ConfirmPwd)
-            {
-                ViewBag.Error = "Passwords don't match !";
-                return View();
-            }
-
-            TB_User u = (TB_User)Session["Admin"];
-
-             TB_User user= entities.TB_User.Where(x=>x.UserName==u.UserName && u.Password==CurrentPwd).FirstOrDefault();
-
-             if (user == null)
-             {
-                 ViewBag.Error = "Current Password is incorrect!";
-                 return View();
-             }
-
-             user.Password = NewPwd;
-             entities.SaveChanges();
-
-             ViewBag.Success = "Password is changed successfully!";
-             return View();
-        }
         public ActionResult AddProduct()
         {
-            if (Session["Admin"] == null)
-            {
-                return RedirectToAction("Index", "Admin");
-            }
             TB_Product prd = new TB_Product();
             prd.TB_ProductID = -1;
             List<TB_Operator> Operators = entities.TB_Operator.ToList<TB_Operator>();
@@ -147,7 +86,8 @@ namespace ECommerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddProduct(TB_Product model)
+        [ValidateInput(false)]
+        public ActionResult AddProduct(TB_Product model,FormCollection formsq)
         {
             TB_Product prd = new TB_Product();
             prd.Product_Name = model.Product_Name;
@@ -176,7 +116,6 @@ namespace ECommerce.Controllers
 
         public ActionResult Products()
         {
-
             if (Session["Admin"] == null)
             {
                 return RedirectToAction("Index", "Admin");
@@ -201,4 +140,3 @@ namespace ECommerce.Controllers
 
     }
 }
-

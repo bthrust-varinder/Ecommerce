@@ -28,6 +28,7 @@
             @Html.HiddenFor(model => model.TB_ProductID)
             @Html.TextBoxFor(x => x.Product_Name, new { @class = "sm-form-control numberonly" })
             @Html.ValidationMessageFor(m => m.Product_Name)
+@*@Html.TextArea("editor", new {@class = "ckeditor", @id = "aboutme"})*@
             @*<input type="text" id="phone" name="phone" value="" class="sm-form-control"/>*@
         </div>
         <div class="col_full">
@@ -57,3 +58,15 @@
 @*</form>*@
     }
 </div>
+
+@section Scripts{
+ <script type="text/javascript">
+
+        $(document).ready(function () {
+            CKEDITOR.replace('ckeditor',
+        {
+            filebrowserBrowseUrl: '/AddProduct'
+        });
+        });
+    </script>
+    }
